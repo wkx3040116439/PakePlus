@@ -6,50 +6,16 @@
   <script src="regionData.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/element-plus/dist/index.css" rel="stylesheet">
   <style>
-    body {
-      padding: 20px;
-      font-family: 'Microsoft YaHei', sans-serif;
-      background: #f5f7fa;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .table-wrapper {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-    }
-    .toolbar {
-      margin-bottom: 20px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    select, button {
-      padding: 8px;
-      font-size: 14px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    th:nth-child(1), td:nth-child(1) { /* 姓名 */
-      width: 90px;
-    }
-    th:nth-child(2), td:nth-child(2) { /* 性别 */
-      width: 60px;
-      text-align: center;
-    }
+    body { padding: 20px; font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .table-wrapper { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    .toolbar { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+    select, button { padding: 8px; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    th:nth-child(1), td:nth-child(1) { width: 90px; }
+    th:nth-child(2), td:nth-child(2) { width: 60px; text-align: center; }
   </style>
 </head>
 <body>
@@ -64,7 +30,7 @@
     <table id="userTable">
       <thead>
         <tr>
-          <th>姓名</th><th>性别</th><th>身份证号</th><th>手机号</th><th>地址</th><th>银行卡号</th>
+          <th>姓名</th><th>性别</th><th>身份证号</th><th>手机号</th><th>邮箱</th><th>地址</th><th>银行卡号</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -79,16 +45,13 @@ const nameChars = "伟刚勇毅俊峰强军平保东文辉力明永健世广志�
 function getRandomFromArray(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-
 function randomKey(obj) {
   const keys = Object.keys(obj);
   return keys[Math.floor(Math.random() * keys.length)];
 }
-
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-
 function generateName() {
   const surname = getRandomFromArray(surnames);
   const len = Math.random() < 0.5 ? 1 : 2;
@@ -98,12 +61,26 @@ function generateName() {
   }
   return surname + name;
 }
-
+// 简单汉字转拼音首字母（仅示例，实际可用第三方库如pinyin.js）
+function toPinyin(name) {
+  const map = {
+    "赵":"zhao","钱":"qian","孙":"sun","李":"li","周":"zhou","吴":"wu","郑":"zheng","王":"wang","冯":"feng","陈":"chen","褚":"chu","卫":"wei","蒋":"jiang","沈":"shen","韩":"han","杨":"yang","朱":"zhu","秦":"qin","尤":"you","许":"xu","何":"he","吕":"lv","施":"shi","张":"zhang","孔":"kong","曹":"cao","严":"yan","华":"hua","金":"jin","魏":"wei"
+  };
+  let py = "";
+  if (map[name[0]]) py += map[name[0]];
+  else py += "user";
+  for (let i = 1; i < name.length; i++) py += "x";
+  return py;
+}
+function generateEmail(name) {
+  const domains = ["@qq.com", "@163.com", "@gmail.com", "@outlook.com", "@sina.com", "@hotmail.com", "@yahoo.com"];
+  const domain = domains[Math.floor(Math.random() * domains.length)];
+  return toPinyin(name) + domain;
+}
 function generatePhone() {
   const prefix = ["130", "131", "132", "133", "134", "135", "136", "137", "138", "139"];
   return prefix[Math.floor(Math.random() * prefix.length)] + Math.floor(Math.random() * 1e8).toString().padStart(8, '0');
 }
-
 function randomDate() {
   const start = new Date(1970, 0, 1);
   const end = new Date(2005, 0, 1);
@@ -111,7 +88,6 @@ function randomDate() {
   const y = date.getFullYear(), m = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0');
   return `${y}${m}${d}`;
 }
-
 function calculateCheckCode(id17) {
   const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
   const checkMap = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -121,7 +97,6 @@ function calculateCheckCode(id17) {
   }
   return checkMap[sum % 11];
 }
-
 function generateIdCard(regionCode) {
   regionCode = regionCode.toString().padStart(6, '0').slice(0, 6);
   const birthday = randomDate();
@@ -130,15 +105,13 @@ function generateIdCard(regionCode) {
   const checkCode = calculateCheckCode(id17);
   return id17 + checkCode;
 }
-
 function generateBankCard() {
   return "6222" + Math.floor(Math.random() * 1e15).toString().padStart(15, '0');
 }
-
 function generateData() {
   const users = [];
   let count = 0;
-  while (count < 50) { // 一定生成50条
+  while (count < 50) {
     const prov = randomKey(regionData);
     const provinceObj = regionData[prov];
     if (!provinceObj.children || provinceObj.children.length === 0) continue;
@@ -147,14 +120,11 @@ function generateData() {
     const districtObj = randomItem(cityObj.children);
     if (!districtObj.children || districtObj.children.length === 0) continue;
     const streetObj = randomItem(districtObj.children);
-
     let villageObj = null;
     if (streetObj.children && streetObj.children.length > 0) {
       villageObj = randomItem(streetObj.children);
     }
-
     const address = prov + cityObj.name + districtObj.name + streetObj.name + (villageObj ? villageObj.name : "");
-
     let regionCode = "610000";
     if (villageObj && villageObj.code) {
       regionCode = villageObj.code;
@@ -163,25 +133,22 @@ function generateData() {
     } else if (districtObj.code) {
       regionCode = districtObj.code;
     }
-
     const name = generateName();
     const gender = Math.random() > 0.5 ? "男" : "女";
     const idCard = generateIdCard(regionCode);
     const phone = generatePhone();
     const bankCard = generateBankCard();
-
-    users.push({ name, gender, idCard, phone, address, province: prov, city: cityObj.name, district: districtObj.name, bankCard });
+    const email = generateEmail(name);
+    users.push({ name, gender, idCard, phone, email, address, province: prov, city: cityObj.name, district: districtObj.name, bankCard });
     count++;
   }
   localStorage.setItem("users", JSON.stringify(users));
   renderTable(users);
 }
-
 function clearData() {
   localStorage.removeItem("users");
   renderTable([]);
 }
-
 function renderTable(users) {
   const tbody = document.querySelector("#userTable tbody");
   const selectedProvince = document.getElementById("provinceSelect").value;
@@ -196,12 +163,12 @@ function renderTable(users) {
       <td>${u.gender}</td>
       <td>${u.idCard}</td>
       <td>${u.phone}</td>
+      <td>${u.email}</td>
       <td>${u.address}</td>
       <td>${u.bankCard}</td>
     </tr>`;
   });
 }
-
 function loadRegions() {
   const provinceSelect = document.getElementById("provinceSelect");
   provinceSelect.innerHTML = '<option value="">全部省份</option>';
@@ -212,7 +179,6 @@ function loadRegions() {
   const saved = localStorage.getItem("users");
   if (saved) renderTable(JSON.parse(saved));
 }
-
 function loadCities() {
   const provinceSelect = document.getElementById("provinceSelect");
   const citySelect = document.getElementById("citySelect");
@@ -225,7 +191,6 @@ function loadCities() {
     });
   }
 }
-
 window.onload = function() {
   loadRegions();
   document.getElementById("provinceSelect").addEventListener("change", () => {
